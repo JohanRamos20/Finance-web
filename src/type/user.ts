@@ -21,18 +21,6 @@ export interface UserDto {
   createdAt: string;
 }
 
-// Formato bruto retornado dentro de POST /sessions — inclui passwordHash.
-// Nunca usar diretamente para exibir ou persistir dados; sempre mapear
-// para UserDto primeiro (ver lib/mappers.ts).
-export interface AuthenticatedUser {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  createdAt: string;
-}
-
 export interface LoginResponse {
-  user: AuthenticatedUser;
-  token: string;
+  user: UserDto;
 }

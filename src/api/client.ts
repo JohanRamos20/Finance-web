@@ -1,5 +1,4 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-const TOKEN_KEY = "finance-web:token";
 
 export interface ApiFieldError {
   field: string;
@@ -16,21 +15,6 @@ export class ApiError extends Error {
     this.status = status;
     this.fieldErrors = fieldErrors;
   }
-}
-
-export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token: string): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearToken(): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(TOKEN_KEY);
 }
 
 interface RequestOptions {
@@ -72,18 +56,27 @@ export async function request<T>(
   }
 
   const headers: Record<string, string> = {};
-  const token = getToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
   if (body !== undefined) headers["Content-Type"] = "application/json";
 
   const response = await fetch(url, {
     method,
     headers,
+    credentials: "include",
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
   if (!response.ok) {
     const { message, fieldErrors } = await parseErrorResponse(response);
+
+    // Sessão ausente/expirada/inválida: o token vive num cookie httpOnly,
+    // então o front não tem como inspecioná-lo antes de bater na API. Este
+    // módulo não é um componente React (pode ser chamado fora de render/
+    // event handlers), então useRouter()/redirect() não se aplicam aqui.
+    if (response.status === 401 && typeof window !== "undefined") {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/login");
+    }
+
     throw new ApiError(response.status, message, fieldErrors);
   }
 

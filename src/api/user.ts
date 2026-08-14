@@ -1,5 +1,4 @@
-import { clearToken, request, setToken } from "@/api/client";
-import { toSafeUser } from "@/lib/mappers";
+import { request } from "@/api/client";
 import type {
   ChangePasswordPayload,
   LoginCredentials,
@@ -13,13 +12,16 @@ export function registerUser(payload: RegisterPayload): Promise<UserDto> {
 }
 
 export async function login(credentials: LoginCredentials): Promise<UserDto> {
-  const { user, token } = await request<LoginResponse>("/sessions", {
+  const { user } = await request<LoginResponse>("/sessions", {
     method: "POST",
     body: credentials,
   });
 
-  setToken(token);
-  return toSafeUser(user);
+  // O token não é lido aqui: ele chega via Set-Cookie httpOnly na própria
+  // resposta (credentials:"include" em client.ts) e o navegador passa a
+  // enviá-lo automaticamente nas próximas requisições. O back-end já
+  // devolve o user sem passwordHash, então não precisa de mapeamento aqui.
+  return user;
 }
 
 export function changePassword(
@@ -31,6 +33,6 @@ export function changePassword(
   });
 }
 
-export function logout(): void {
-  clearToken();
+export function logout(): Promise<{ message: string }> {
+  return request<{ message: string }>("/sessions/logout", { method: "POST" });
 }
