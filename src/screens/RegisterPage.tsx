@@ -1,11 +1,11 @@
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthBrand } from "@/components/auth/AuthBrand";
-import { LoginForm } from "@/components/auth/LoginForm";
+import { RegisterForm } from "@/components/auth/RegisterForm";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <AuthLayout brand={<AuthBrand />}>
-      <LoginForm />
+      <RegisterForm />
     </AuthLayout>
   );
 }
