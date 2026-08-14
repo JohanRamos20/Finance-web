@@ -1,4 +1,5 @@
 import { request } from "@/api/client";
+import { clearStoredUser, setStoredUser } from "@/api/session";
 import type {
   ChangePasswordPayload,
   LoginCredentials,
@@ -21,6 +22,9 @@ export async function login(credentials: LoginCredentials): Promise<UserDto> {
   // resposta (credentials:"include" em client.ts) e o navegador passa a
   // enviá-lo automaticamente nas próximas requisições. O back-end já
   // devolve o user sem passwordHash, então não precisa de mapeamento aqui.
+  // Guardamos o nome/e-mail (não-sensível) pra exibir na UI, já que não há
+  // endpoint "quem sou eu" no back-end.
+  setStoredUser(user);
   return user;
 }
 
@@ -33,6 +37,10 @@ export function changePassword(
   });
 }
 
-export function logout(): Promise<{ message: string }> {
-  return request<{ message: string }>("/sessions/logout", { method: "POST" });
+export async function logout(): Promise<{ message: string }> {
+  const result = await request<{ message: string }>("/sessions/logout", {
+    method: "POST",
+  });
+  clearStoredUser();
+  return result;
 }
