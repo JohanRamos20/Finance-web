@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { login } from "@/api/auth";
+import { ApiError } from "@/api/client";
+import { login } from "@/api/user";
 
 export function LoginForm() {
   const router = useRouter();
@@ -24,15 +25,19 @@ export function LoginForm() {
 
     setError("");
     setSubmitting(true);
-    const result = await login({ email, password });
-    setSubmitting(false);
 
-    if (!result.ok) {
-      setError(result.message);
-      return;
+    try {
+      await login({ email, password });
+      router.push("/");
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Não foi possível entrar. Tente novamente.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    router.push("/");
   }
 
   return (
