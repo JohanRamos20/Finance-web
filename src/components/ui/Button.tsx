@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 import clsx from "clsx";
 
-type ButtonVariant = "primary" | "secondary";
+type ButtonVariant = "primary" | "secondary" | "danger";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
@@ -11,6 +11,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary: "border-accent text-accent hover:bg-accent/10 active:bg-accent/20",
   secondary: "border-divider text-text hover:bg-text/5 active:bg-text/10",
+  danger:
+    "border-accent-300 text-accent-300 hover:bg-accent-300/10 active:bg-accent-300/20",
 };
 
 export function Button({
