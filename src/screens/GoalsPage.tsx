@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { GoalCard } from "@/components/goals/GoalCard";
 import { NewGoalModal } from "@/components/goals/NewGoalModal";
 import { ContributeGoalModal } from "@/components/goals/ContributeGoalModal";
+import { DeleteGoalDialog } from "@/components/goals/DeleteGoalDialog";
 import type { GoalDto } from "@/type/goal";
 
 export default function GoalsPage() {
@@ -15,6 +16,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<GoalDto[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [goalToContribute, setGoalToContribute] = useState<GoalDto | null>(null);
+  const [goalToDelete, setGoalToDelete] = useState<GoalDto | null>(null);
 
   const loadData = useCallback(async () => {
     const data = await getGoals();
@@ -72,7 +74,12 @@ export default function GoalsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onContribute={setGoalToContribute} />
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onContribute={setGoalToContribute}
+              onDelete={setGoalToDelete}
+            />
           ))}
         </div>
       )}
@@ -87,6 +94,12 @@ export default function GoalsPage() {
         goal={goalToContribute}
         onClose={() => setGoalToContribute(null)}
         onContributed={loadData}
+      />
+
+      <DeleteGoalDialog
+        goal={goalToDelete}
+        onClose={() => setGoalToDelete(null)}
+        onDeleted={loadData}
       />
     </div>
   );

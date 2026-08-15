@@ -21,3 +21,9 @@ export function contributeToGoal(
     body: { amount },
   });
 }
+
+export function deleteGoal(goalId: string): Promise<{ message: string }> {
+  return request<{ message: string }>(`/users/me/goals/${goalId}`, {
+    method: "DELETE",
+  });
+}
